@@ -11,7 +11,7 @@
 
 # Description
 
-This is the entry class for a WeChat Mini Program Demo application based on the Spring Boot framework. The class is named WxMaDemoApplication and is marked with the @SpringBootApplication annotation, indicating that it is the main configuration class for a Spring Boot application. The class contains a standard main method, which starts the entire Spring Boot application by calling SpringApplication.run, passing the current class name and command-line arguments as parameters. As the application's startup entry point, this class is responsible for initializing the Spring container and launching the embedded server.
+This is the entry class for a WeChat Mini Program demo application based on the Spring Boot framework. The class is named WxMaDemoApplication and is marked with the @SpringBootApplication annotation, indicating it is the main configuration class of a Spring Boot application. The class contains a standard main method, which launches the entire Spring Boot application by calling SpringApplication.run, with the current class name and command-line arguments passed as parameters. As the startup entry point of the application, this class is responsible for initializing the Spring container and launching the embedded server.
 
 # Class Summary
 
@@ -45,7 +45,7 @@ classDiagram
     }
 ```
 
-This class diagram illustrates the dependency relationship between WxMaDemoApplication and SpringApplication. WxMaDemoApplication is a Spring Boot application startup class that invokes SpringApplication.run() via its main method to launch the application. SpringApplication is the core bootstrap class of the Spring Framework, providing the run method to initialize and start the Spring application context. The diagram clearly demonstrates the typical startup process of a Spring Boot application and the core component dependencies.
+This class diagram illustrates the dependency relationship between WxMaDemoApplication and SpringApplication. WxMaDemoApplication is a Spring Boot application startup class that invokes SpringApplication.run() via its main method to launch the application. SpringApplication is the core bootstrap class in the Spring Framework, providing the run method to initialize and start the Spring application context. The diagram clearly demonstrates the typical startup process of a Spring Boot application and the core component dependencies.
 
 
 ### Internal Method Call Graph
@@ -62,7 +62,7 @@ graph TD
     C --> D
 ```
 
-This code represents a standard Spring Boot application launcher class, where the main configuration class is marked with the @SpringBootApplication annotation, and the SpringApplication.run() method is invoked in the main method to start the embedded web server and Spring application context. The flowchart illustrates the class structure, annotations, and the invocation relationship of the startup logic, with the core focus being Spring Boot's auto-configuration and startup process.
+This code represents a standard Spring Boot application startup class. The main configuration class is marked with the @SpringBootApplication annotation, and the SpringApplication.run() method is called within the main method to launch the embedded web server and Spring application context. The flowchart illustrates the class structure, annotations, and the invocation relationship of startup logic, with the core focus being Spring Boot's auto-configuration and startup process.
 
 ### Field List
 

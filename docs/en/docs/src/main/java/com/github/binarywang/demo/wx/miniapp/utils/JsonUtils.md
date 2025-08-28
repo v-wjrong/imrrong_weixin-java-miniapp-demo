@@ -7,17 +7,17 @@
 | Code Path | weixin-java-miniapp-demo/src/main/java/com/github/binarywang/demo/wx/miniapp/utils/JsonUtils.java |
 | Package Name | com.github.binarywang.demo.wx.miniapp.utils |
 | Dependencies | ['com.fasterxml.jackson.annotation.JsonInclude.Include', 'com.fasterxml.jackson.core.JsonProcessingException', 'com.fasterxml.jackson.databind.ObjectMapper', 'com.fasterxml.jackson.databind.SerializationFeature'] |
-| Brief Description | The JsonUtils class provides a static method `toJson`, which uses ObjectMapper to convert an object into a JSON string, automatically ignoring null values and formatting the output. Returns null in case of an exception. |
+| Brief Description | The JsonUtils class provides a static method `toJson`, which uses ObjectMapper to convert an object into a JSON string, automatically ignoring null values and formatting the output. Returns null if an exception occurs. |
 
 # Description
 
-This is a utility class named JsonUtils, primarily used for handling JSON data conversion. The class contains a static ObjectMapper instance named JSON, which is configured in the static initialization block to ignore null values during serialization and enable indented formatting for output. It provides a toJson method that converts any object into a JSON string, returning null and printing the exception if the conversion fails. The entire class encapsulates basic JSON serialization functionality, making it convenient for other code to call.
+This is a utility class named JsonUtils, primarily used for handling JSON data conversion. The class contains a static ObjectMapper instance named JSON, which is configured in the static initialization block to ignore null values during serialization and enable indented formatting for output. It provides a toJson method that converts any object into a JSON string, printing an exception and returning null if the conversion fails. The entire class encapsulates basic JSON serialization functionality for easy invocation by other code.
 
 # Class Summary
 
 | Name   | Type  | Description |
 |-------|------|-------------|
-| JsonUtils | class | The JsonUtils class provides a static method `toJson`, which uses ObjectMapper to convert an object into a JSON string, automatically ignoring null values and formatting the output. |
+| JsonUtils | class | The JsonUtils class provides a static method `toJson` that converts an object to a JSON string using ObjectMapper, automatically ignoring null values and formatting the output. |
 
 
 
@@ -28,7 +28,7 @@ This is a utility class named JsonUtils, primarily used for handling JSON data c
 | Access Modifier | public |
 | Type | class |
 | Name | JsonUtils |
-| Description | The JsonUtils class provides a static method `toJson`, which uses ObjectMapper to convert an object into a JSON string, automatically ignoring null values and formatting the output. |
+| Description | The JsonUtils class provides a static method `toJson` that converts an object to a JSON string using ObjectMapper, automatically ignoring null values and formatting the output. |
 
 
 ### UML Class Diagram
@@ -64,7 +64,7 @@ classDiagram
     JsonUtils ..> JsonProcessingException : May throw
 ```
 
-This class diagram illustrates the structure of the JsonUtils utility class and its related dependencies. JsonUtils utilizes ObjectMapper for JSON serialization operations, configuring features such as null value exclusion and indented output through static initialization blocks. The diagram includes core components like ObjectMapper, Include enum, SerializationFeature enum, and the potential JsonProcessingException, clearly presenting the key elements and exception handling mechanism in JSON serialization.
+This class diagram illustrates the structure of the JsonUtils utility class and its related dependencies. JsonUtils utilizes ObjectMapper for JSON serialization operations, configuring features such as ignoring null values and indented output through a static initialization block. The diagram includes ObjectMapper, the Include enum, SerializationFeature enum, and the potentially thrown JsonProcessingException, clearly presenting the core components and exception handling mechanism in the JSON serialization process.
 
 
 ### Internal Method Call Graph
@@ -86,7 +86,7 @@ graph TD
     E -->|"Print Stack Trace"| F
 ```
 
-The flowchart depicts the structure and workflow of the JsonUtils class. It contains a static ObjectMapper instance JSON, configured in the static initialization block for non-null value serialization and indented output. The core method toJson converts an object to a string using the JSON instance, printing the stack trace and returning null upon exceptions. The process clearly illustrates the complete path from method invocation to result return/exception handling.
+The flowchart describes the structure and workflow of the JsonUtils class. This class contains a static ObjectMapper instance JSON, configured in the static initialization block for non-null value serialization and indented output. The core method toJson converts an object to a string using the JSON instance, printing the stack trace and returning null on exception. The process clearly illustrates the complete path from method invocation to result return/exception handling.
 
 ### Field List
 

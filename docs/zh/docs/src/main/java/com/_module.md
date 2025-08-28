@@ -6,15 +6,15 @@
 | 编码语言 | .java |
 | 代码路径 | weixin-java-miniapp-demo/src/main/java/com |
 | 包名 | docs.src.main.java.com |
-| 概述说明 | JsonUtils工具类处理JSON转换，配置忽略null值并格式化输出。错误处理模块统一管理404/500错误跳转。微信小程序配置模块整合基础属性和消息处理。控制器模块处理媒体文件、用户会话和微信交互。应用入口类WxMaDemoApplication启动Spring Boot应用。 |
+| 概述说明 | Spring Boot微信小程序Demo，包含启动类、控制器、配置、错误处理和工具模块。控制器处理微信交互，配置管理多账号，工具模块提供JSON和文件处理功能。 |
 
 # 说明
 
 ## 概述  
-该模块是微信小程序后端综合系统，核心职责包括JSON数据处理、错误统一处理、多账号配置管理和微信生态交互（如媒体/会话处理）。采用分层架构设计，类似微服务配置中心与网关模式的结合。接口规范涵盖RESTful端点（如/error/404）、微信标准API（如code2session）和文件传输协议。关键数据结构包含WxMaProperties.Config（凭证存储）、ErrorPageRegistry（错误映射）和微信标准参数（media_id等）。外部依赖Spring Boot框架、微信SDK、JSSDK及消息加解密库。例如JsonUtils实现对象序列化，ErrorController处理错误跳转。
+该模块是微信小程序后端服务集合，整合了微信生态交互、配置管理、错误处理和工具类功能。采用Spring Boot框架，通过RESTful接口和文件传输实现微信服务器通信，类似网关模式处理验证、授权和媒体管理。关键数据结构包括微信标准参数（media_id/appid）、配置属性（WxMaProperties.Config）和MinIO存储策略。外部依赖微信JSSDK、Jackson库、MinIO服务和Spring MVC。例如媒体控制器处理多文件上传，JsonUtils实现对象序列化。
 
 ## 主要业务场景  
-模块支持小程序全生命周期管理：初始化阶段加载多账号配置（类似配置中心），运行时处理用户授权（OAuth2.0简化流程）、媒体资源托管（类似CDN）和异常拦截（统一错误页）。采用责任链模式处理微信消息（如文本/图片），类似事件总线的分发机制。典型场景包括服务器验证握手、临时素材管理及异步消息响应。例如门户控制器同时处理GET/POST请求，WxMaConfiguration动态路由消息类型。API集成案例覆盖从凭证校验到文件上传的微信标准场景。
+模块覆盖小程序全生命周期：服务器验证（类似握手协议）、用户登录（OAuth2.0简化流程）、媒体托管（类似CDN）和错误拦截。典型流程为接收参数→验证配置→执行业务→返回数据，例如用户控制器串联code2session与信息解密。功能完整性体现在多账号配置加载、错误页自动跳转（如404触发/error/404）和文件上传校验（限制50MB）。集成案例包括消息推送处理、临时素材管理和JSON数据交互。
 
 
 ### 包内部结构视图
@@ -26,28 +26,29 @@ graph TD
     binarywang --> demo
     demo --> wx
     wx --> miniapp
-    miniapp --> utils
-    miniapp --> error
-    miniapp --> config
-    miniapp --> controller
     miniapp --> WxMaDemoApplication.java
-    utils --> JsonUtils.java
-    error --> ErrorController.java
-    error --> ErrorPageConfiguration.java
-    config --> WxMaProperties.java
-    config --> ResourcesConfig.java
-    config --> WxMaConfiguration.java
+    miniapp --> controller
+    miniapp --> config
+    miniapp --> error
+    miniapp --> utils
     controller --> WxMaMediaController.java
     controller --> WxMaUserController.java
     controller --> WxPortalController.java
+    config --> WxMaProperties.java
+    config --> ResourcesConfig.java
+    config --> WxMaConfiguration.java
+    error --> ErrorController.java
+    error --> ErrorPageConfiguration.java
+    utils --> JsonUtils.java
+    utils --> FileUploadUtils.java
 ```
 
-该流程图展示了微信小程序Java项目的核心目录结构，从根包com开始逐级展开至具体功能模块。miniapp作为核心模块包含5个子模块：utils工具类、error异常处理、config配置类、controller控制器以及主应用文件。每个子模块下又细分具体功能类，如config包含微信配置相关类，controller处理不同业务请求。整体结构清晰体现了典型Spring Boot应用的分层设计思想。
+该流程图展示了微信小程序Java项目的层级结构，从顶级包com开始，逐步展开到具体的应用类、控制器、配置类、错误处理类和工具类。整个结构清晰展示了项目模块间的从属关系，其中miniapp作为核心模块包含多个子模块，每个子模块下又有具体的功能实现类。
 
 # 文件列表
 
 | 名称   | 类型  | 说明 |
 |-------|------|-------------|
-| [github](github/_module.md) | package | JsonUtils工具类处理JSON转换，配置忽略null值并格式化输出。错误处理模块统一管理404/500错误跳转。微信小程序配置模块整合基础属性和消息处理。控制器模块处理媒体文件、用户会话和微信交互。应用入口类WxMaDemoApplication启动Spring Boot应用。 |
+| [github](github/_module.md) | package | Spring Boot微信小程序Demo，包含启动类、控制器、配置、错误处理和工具模块。控制器处理微信交互，配置管理多账号，工具模块提供JSON和文件处理功能。 |
 
 

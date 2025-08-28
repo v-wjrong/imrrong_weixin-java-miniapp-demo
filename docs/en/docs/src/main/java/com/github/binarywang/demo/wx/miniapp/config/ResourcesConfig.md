@@ -7,7 +7,7 @@
 | Code Path | weixin-java-miniapp-demo/src/main/java/com/github/binarywang/demo/wx/miniapp/config/ResourcesConfig.java |
 | Package Name | com.leaniss.file.config |
 | Dependencies | ['java.io.File', 'org.springframework.beans.factory.annotation.Value', 'org.springframework.context.annotation.Configuration', 'org.springframework.web.servlet.config.annotation.CorsRegistry', 'org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry', 'org.springframework.web.servlet.config.annotation.WebMvcConfigurer'] |
-| Brief Description | Java configuration class implements local file path mapping and cross-origin support, setting file storage path and prefix, while allowing GET requests for cross-origin access. |
+| Brief Description | Java configuration class implements local file path mapping and cross-origin support, sets file storage path and prefix, and allows GET requests for cross-origin access. |
 
 # Description
 
@@ -17,7 +17,7 @@ This is a Spring Boot configuration class designed to handle file uploads and cr
 
 | Name   | Type  | Description |
 |-------|------|-------------|
-| ResourcesConfig | class | Java configuration class implements file resource mapping and cross-origin support, setting local storage path and URL prefix, allowing GET requests for cross-origin access. |
+| ResourcesConfig | class | Java configuration class implements file resource mapping and cross-origin support, sets local storage path and URL prefix, and allows GET requests for cross-origin access. |
 
 
 
@@ -28,7 +28,7 @@ This is a Spring Boot configuration class designed to handle file uploads and cr
 | Access Modifier | @Configuration;public |
 | Type | class |
 | Name | ResourcesConfig |
-| Description | Java configuration class implements file resource mapping and cross-origin support, setting local storage path and URL prefix, allowing GET requests for cross-origin access. |
+| Description | Java configuration class implements file resource mapping and cross-origin support, sets local storage path and URL prefix, and allows GET requests for cross-origin access. |
 
 
 ### UML Class Diagram
@@ -49,12 +49,12 @@ classDiagram
     }
 
     ResourcesConfig ..|> WebMvcConfigurer : implements
-    ResourcesConfig --> ResourceHandlerRegistry : dependency
-    ResourcesConfig --> CorsRegistry : dependency
+    ResourcesConfig --> ResourceHandlerRegistry : depends
+    ResourcesConfig --> CorsRegistry : depends
 ```
 
 Class diagram description:
-The ResourcesConfig class is a Spring configuration class that implements the WebMvcConfigurer interface, primarily used for configuring resource handling and cross-origin requests. It contains two main methods: addResourceHandlers for mapping local file paths to URL prefixes, and addCorsMappings for configuring cross-origin access rules. The class includes two properties injected from configuration files: the path prefix (localFilePrefix) and local file path (localFilePath).
+The ResourcesConfig class is a Spring configuration class that implements the WebMvcConfigurer interface, primarily used for configuring resource handling and cross-origin requests. It contains two main methods: addResourceHandlers for mapping local file paths to URL prefixes, and addCorsMappings for configuring cross-origin access rules. The class includes two properties injected from configuration files: the path prefix (localFilePrefix) and the local file path (localFilePath).
 
 
 ### Internal Method Call Graph
