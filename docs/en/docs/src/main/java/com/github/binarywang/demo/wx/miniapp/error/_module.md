@@ -6,32 +6,36 @@
 | Language | .java |
 | Code Path | weixin-java-miniapp-demo/src/main/java/com/github/binarywang/demo/wx/miniapp/error |
 | Package Name | docs.src.main.java.com.github.binarywang.demo.wx.miniapp.error |
-| Brief Description | The ErrorController class handles 404 and 500 errors under the /error path, returning a unified error page. The ErrorPageConfiguration class implements error page configuration, mapping the 404 and 500 status codes to their corresponding paths. |
+| Brief Description | The code defines two Spring components. ErrorPageConfiguration configures 404 and 500 errors to point to custom paths. ErrorController provides endpoints to handle these error paths and returns error views. Implements custom HTTP error handling. |
 
 # Description
 
-## Overview  
-The core responsibility of this module is to uniformly handle HTTP error responses by implementing page redirection for 404/500 errors through controllers and configuration classes. The interface specification includes two GET endpoints: `/error/404` and `/error/500`, both returning the "error" view template. The key data structure is Spring's `ErrorPageRegistry`, used for registering error path mappings. The only external dependency is the Spring MVC framework. For example, `ErrorController` handles path mapping, while `ErrorPageConfiguration` implements error redirection configuration.  
+## Overview
+This module is responsible for providing a custom HTTP error page handling mechanism for web applications. Its core responsibility is to centrally configure and respond to specific HTTP error status codes. The interface specification involves implementing Spring's `ErrorPageRegistrar` to register error path mappings and providing an `ErrorController` to handle the mapped requests. Key data structures include Spring MVC's `ErrorPage` and the `ErrorPageRegistry` used for registration. The primary external dependency is the Spring Framework.
 
-## Key Business Scenarios  
-The module adopts a frontend-backend collaboration model, similar to a gateway error interception mechanism. When a 404/500 error occurs in the system, it automatically routes to predefined paths and renders a unified error page. Functional completeness is reflected in the closed-loop handling of error capture and view return, such as triggering `/error/404` redirection for missing 404 resources. Typical application scenarios include API request exceptions or static resource loss, where standardized error pages enhance user experience.
+For example, `ErrorPageConfiguration` maps status codes 404 and 500 to the paths `/error/404` and `/error/500`, respectively.
+
+## Primary Business Scenarios
+The module implements a complete process from error capture to error page display. When the application throws a 404 or 500 error, the process resembles an event bus pattern. The request is automatically directed to the configured path and handled by the corresponding method in the `ErrorController`. This provides a unified error interaction pattern.
+
+Its functionality fully covers the custom handling of these two common errors. The typical application pattern is integration into a Spring Boot web application to replace default error pages. The API types are Spring configuration classes and REST controllers. The integration example is the aforementioned error page configuration and response controller.
 
 
 ### Package Internal Structure View
 
 ```mermaid
 graph TD
-    error --> ErrorController.java
     error --> ErrorPageConfiguration.java
+    error --> ErrorController.java
 ```
 
-This flowchart illustrates the hierarchical structure of the error handling module in the WeChat Mini Program demo project. The root node is the error directory, which contains two sub-files: ErrorController.java handles error requests, and ErrorPageConfiguration.java configures error pages. The structure is concise and clear, reflecting the basic composition of the error handling module.
+This flowchart shows two Java files under the `error` directory: `ErrorPageConfiguration.java` and `ErrorController.java`. Both files are located directly within the `error` directory, forming a simple two-level structure. This reflects the basic code organization of the project's error handling module, with `error` as the parent node and the two controller files as its children.
 
 # File List
 
 | Name   | Type  | Description |
 |-------|------|-------------|
-| [ErrorController.java](ErrorController.md) | file | The ErrorController handles 404 and 500 errors, returning a unified error page. |
-| [ErrorPageConfiguration.java](ErrorPageConfiguration.md) | file | The ErrorPageConfiguration class implements the ErrorPageRegistrar interface, registering 404 and 500 error pages mapped to the /error/404 and /error/500 paths respectively. |
+| [ErrorPageConfiguration.java](ErrorPageConfiguration.md) | file | This component registers custom error pages, redirecting to specified paths for handling 404 or 500 errors respectively. |
+| [ErrorController.java](ErrorController.md) | file | This controller handles 404 and 500 errors, mapping them to the corresponding paths via @GetMapping and returning the error view. |
 
 

@@ -1,15 +1,17 @@
 
 # weixin-java-miniapp-demo
 
-## Overview  
-This project serves as the core backend system for WeChat Mini Program, functioning as an integrated gateway within the WeChat ecosystem (similar to an API Gateway model). It primarily addresses enterprise-level mini program development challenges such as multi-account management, secure interactions, and resource hosting. By employing a unified access layer, it decouples WeChat protocol communication from business logic. Built on a Spring Boot monolithic architecture, its core components include a WeChat JSSDK adapter, a hot-reloading configuration module, and MinIO storage extension, forming a "configuration-driven + standardized response" technical matrix.  
+## Overview
+This is a backend service module for WeChat Mini Programs built on Spring Boot. Its core function is to act as a "configurable API gateway and business logic layer" bridging the WeChat ecosystem and enterprise business applications. It addresses challenges in mini program backend development such as complex configuration and scattered logic when integrating with official WeChat services. By providing unified RESTful API proxies, it encapsulates key interactions including media management, user authentication, and message handling.
 
-The architectural features manifest in three aspects: encapsulating WeChat native protocols via RESTful interfaces (analogous to banking clearing systems), achieving multi-tenant configuration isolation through WxMaProperties, and extending media storage capabilities with MinIO. Typical implementations include the media controller integrating file validation and CDN distribution, and the error interceptor enabling automatic mapping of HTTP status codes to user-friendly pages. External dependencies form a closed-loop WeChat ecosystem tech stack, encompassing OAuth2.0 authorization, Jackson serialization, and Spring MVC routing control.  
+The project adopts a monolithic microservices architecture. Its core components include a series of HTTP endpoints with dynamic configuration awareness, a Service layer encapsulating WeChat interaction logic, and utility classes for file processing. The overall flow is visualized as a clear "Request Entry → Dynamic Configuration Loading → WeChat SDK Call → Response Return" pipeline, akin to an intelligent routing hub. It dynamically switches the service context based on the mini program identifier (`appid`) carried by each request.
 
-## What is weixin-java-miniapp-demo?  
-This is a Java-based backend reference implementation for WeChat Mini Programs. Its core modules include an authentication gateway (similar to customs security checks), a user session factory, a media repository, and an exception handling pipeline. The technical foundation relies on WeChat's open protocols, such as implementing passwordless login via the code2session interface (akin to a temporary pass mechanism) and decrypting user information using AES-128-CBC. Module interactions follow a funnel model: requests first undergo signature verification, are then routed to business processors, and finally output through a unified response wrapper.  
+## What is weixin-java-miniapp-demo?
+This project consolidates the core functional modules required for a WeChat Mini Program backend. The main modules include a Configuration Center, Media Service, User Service, and Message Service, which operate in synergy: the Configuration Center provides dynamic WeChat connection properties for all requests; the Media Service handles file uploads to WeChat servers; the User Service manages login and sessions; and the Message Service routes and processes events from the WeChat server.
 
-Typical application scenarios cover the entire e-commerce mini program lifecycle: user QR code scanning triggers OAuth2.0 login (similar to self-service ticketing), uploading product images to MinIO storage pools (like a cloud photo album), and post-payment template message推送 (analogous to delivery notifications). Specific implementation examples include: multi-file uploads utilizing chunked transfer technology, an error handling chain enabling smart redirects from 404 to marketing pages, and hot configuration updates via the @RefreshScope annotation (comparable to remote meter adjustments). The system is particularly suited for medium-to-large projects requiring rapid integration with the WeChat ecosystem, with basic functionality deployable in just 5 minutes.
+Its technical implementation is based on the Spring Boot Web framework and the official WeChat Java SDK (`weixin-java-miniapp`), exposing RESTful interfaces via the HTTP protocol. For example, the `POST /media/upload` interface receives files, calls the WeChat SDK for upload, and obtains a `media_id`; the `GET /user/login` interface uses a temporary credential (code) to exchange for the user's `openid` and session key. The entire process follows a unified pattern of "Dynamic Configuration Loading → Calling WeChat API → Processing Returned Data."
+
+The integrated application scenarios form a typical mini program backend solution. For instance, in e-commerce, after a user logs in on the frontend, this backend can decrypt and obtain their identity information for order placement; a content management backend can use it to upload product images to WeChat's temporary media library; the WeChat server can also use its provided verification interface and message router (e.g., `WxMaMessageRouter`) to relay user events to business processors, enabling automated replies or data synchronization.
 
 ## Quick Navigation
 
@@ -28,5 +30,5 @@ Typical application scenarios cover the entire e-commerce mini program lifecycle
 
 ### ↔️ API Documentation
 
-- <a href='https://code2docs.ai/wiki/imrrong/weixin-java-miniapp-demo/d21f5a8a73648edcf0c9fd32da9ed37f6ec5e9d8/api-viewer.html' target='_blank'>API Documentation</a> - API Documentation
+- <a href='http://52.237.88.89/wiki/imrrong/weixin-java-miniapp-demo/ad4e92ea03d50881b46030322f079b9c36ca0f0e/api-viewer.html' target='_blank'>API Documentation</a> - API Documentation
 

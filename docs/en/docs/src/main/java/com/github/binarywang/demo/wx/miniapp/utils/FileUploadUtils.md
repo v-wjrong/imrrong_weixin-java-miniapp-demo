@@ -7,17 +7,17 @@
 | Code Path | weixin-java-miniapp-demo/src/main/java/com/github/binarywang/demo/wx/miniapp/utils/FileUploadUtils.java |
 | Package Name | com.leaniss.file.utils |
 | Dependencies | ['java.io.File', 'java.io.IOException', 'java.nio.file.Paths', 'java.security.InvalidKeyException', 'java.security.NoSuchAlgorithmException', 'java.util.Objects', 'com.leaniss.file.bean.MinioBucket', 'io.minio.BucketExistsArgs', 'io.minio.GetBucketPolicyArgs', 'io.minio.MakeBucketArgs', 'io.minio.SetBucketPolicyArgs', 'io.minio.errors', 'lombok.SneakyThrows', 'org.apache.commons.io.FilenameUtils', 'org.springframework.web.multipart.MultipartFile', 'com.leaniss.common.core.exception.file.FileException', 'com.leaniss.common.core.exception.file.FileNameLengthLimitExceededException', 'com.leaniss.common.core.exception.file.FileSizeLimitExceededException', 'com.leaniss.common.core.exception.file.InvalidExtensionException', 'com.leaniss.common.core.utils.DateUtils', 'com.leaniss.common.core.utils.StringUtils', 'com.leaniss.common.core.utils.file.FileTypeUtils', 'com.leaniss.common.core.utils.file.MimeTypeUtils', 'com.leaniss.common.core.utils.uuid.Seq'] |
-| Brief Description | The FileUploadUtils class provides file upload functionality, supporting size and type validation. By default, it limits files to 50MB and filenames to 100 characters. It also includes MinIO bucket management methods such as creating buckets, checking existence, and setting policies. |
+| Brief Description | The FileUploadUtils class provides file upload functionality, including default configurations such as a file size limit of 50MB and a filename length limit of 100 characters. It supports uploading to specified directories and validating file types; if limits are exceeded, an exception is thrown. It also includes MinIO bucket management features, enabling the checking, creation, and configuration of bucket policies. |
 
 # Description
 
-FileUploadUtils is a file upload utility class that provides functionalities such as file uploading, size validation, and filename processing. The default file size limit is 50M, and the filename length is restricted to 100 characters. It supports uploading based on file paths, validating file types and sizes, and handling filename encoding. Additionally, it includes MinIO bucket management features, such as creating buckets, checking bucket existence, and setting or querying bucket policies. The default bucket policy allows public read and write operations.
+This is a Java file upload utility class. It defines a default maximum file size of 50MB and a default maximum filename length of 100 characters. The core functionality includes uploading by specifying a base directory and a file, with the option to allow specific file extensions. The upload process includes filename length validation, file size and extension validation, then generating a new filename that includes a date path and sequence number and saving it to the specified location. Additionally, it contains a set of methods for interacting with the MinIO object storage service, used to create buckets, check if a bucket exists, and set a bucket's access policy. When creating a bucket, it first checks if it already exists, then sets a default policy allowing operations such as public object retrieval, uploads, and deletions.
 
 # Class Summary
 
 | Name   | Type  | Description |
 |-------|------|-------------|
-| FileUploadUtils | class | The FileUploadUtils class provides file upload functionality, supporting size validation, filename length restrictions, and type validation, with a default size of 50M and filename length of 100. It also includes MinIO bucket management methods such as creating buckets, checking existence, setting policies, etc. |
+| FileUploadUtils | class | The FileUploadUtils class provides file upload and MinIO bucket management functionalities, supporting validation of file size, type, and name length, as well as creation and configuration of storage bucket policies. |
 
 
 
@@ -28,7 +28,7 @@ FileUploadUtils is a file upload utility class that provides functionalities suc
 | Access Modifier | public |
 | Type | class |
 | Name | FileUploadUtils |
-| Description | The FileUploadUtils class provides file upload functionality, supporting size validation, filename length restrictions, and type validation, with a default size of 50M and filename length of 100. It also includes MinIO bucket management methods such as creating buckets, checking existence, setting policies, etc. |
+| Description | The FileUploadUtils class provides file upload and MinIO bucket management functionalities, supporting validation of file size, type, and name length, as well as creation and configuration of storage bucket policies. |
 
 
 ### UML Class Diagram
@@ -38,63 +38,127 @@ classDiagram
     class FileUploadUtils {
         +long DEFAULT_MAX_SIZE
         +int DEFAULT_FILE_NAME_LENGTH
-        +String upload(String baseDir, MultipartFile file) throws IOException
-        +String upload(String baseDir, MultipartFile file, String[] allowedExtension) throws FileSizeLimitExceededException, IOException, FileNameLengthLimitExceededException, InvalidExtensionException
+        +String upload(String baseDir, MultipartFile file) IOException
+        +String upload(String baseDir, MultipartFile file, String[] allowedExtension) FileSizeLimitExceededException, IOException, FileNameLengthLimitExceededException, InvalidExtensionException
         +String extractFilename(MultipartFile file)
-        -File getAbsoluteFile(String uploadDir, String fileName) throws IOException
-        -String getPathFileName(String fileName) throws IOException
-        +void assertAllowed(MultipartFile file, String[] allowedExtension) throws FileSizeLimitExceededException, InvalidExtensionException
+        -File getAbsoluteFile(String uploadDir, String fileName) IOException
+        -String getPathFileName(String fileName) IOException
+        +void assertAllowed(MultipartFile file, String[] allowedExtension) FileSizeLimitExceededException, InvalidExtensionException
         +boolean isAllowedExtension(String extension, String[] allowedExtension)
-        +void createBucket(MinioBucket minioBucket) throws IOException, InvalidKeyException, InvalidResponseException, InsufficientDataException, NoSuchAlgorithmException, ServerException, InternalException, XmlParserException, ErrorResponseException
-        +boolean bucketExist(MinioBucket minioBucket) throws IOException, InvalidKeyException, InvalidResponseException, InsufficientDataException, NoSuchAlgorithmException, ServerException, InternalException, XmlParserException, ErrorResponseException
+        +void createBucket(MinioBucket minioBucket) IOException, InvalidKeyException, InvalidResponseException, InsufficientDataException, NoSuchAlgorithmException, ServerException, InternalException, XmlParserException, ErrorResponseException
+        +boolean bucketExist(MinioBucket minioBucket) IOException, InvalidKeyException, InvalidResponseException, InsufficientDataException, NoSuchAlgorithmException, ServerException, InternalException, XmlParserException, ErrorResponseException
         +StringBuilder queryBucketPolicy(MinioBucket minioBucket)
         +void createBucketPolicy(MinioBucket minioBucket)
         +void createBucketPolicy(StringBuilder builder, MinioBucket minioBucket)
         -StringBuilder defaultBucketPolicy(String bucketName)
     }
-
+    
     class MultipartFile {
         <<Interface>>
         +String getOriginalFilename()
         +long getSize()
-        +void transferTo(Path dest) throws IOException, IllegalStateException
+        +void transferTo(Path dest) IOException, IllegalStateException
     }
-
-    class FileException {
-        +String getDefaultMessage()
-    }
-
+    
     class FileSizeLimitExceededException {
         +FileSizeLimitExceededException(long maxSize)
     }
-
+    
     class FileNameLengthLimitExceededException {
         +FileNameLengthLimitExceededException(int maxLength)
     }
-
+    
     class InvalidExtensionException {
         <<Interface>>
+    }
+    
+    class InvalidImageExtensionException {
         +InvalidImageExtensionException(String[] allowedExtension, String extension, String fileName)
+    }
+    
+    class InvalidFlashExtensionException {
         +InvalidFlashExtensionException(String[] allowedExtension, String extension, String fileName)
+    }
+    
+    class InvalidMediaExtensionException {
         +InvalidMediaExtensionException(String[] allowedExtension, String extension, String fileName)
+    }
+    
+    class InvalidVideoExtensionException {
         +InvalidVideoExtensionException(String[] allowedExtension, String extension, String fileName)
     }
-
+    
     class MinioBucket {
         +String getBucketName()
         +String getRegion()
         +MinioClient getMinioClient()
     }
-
-    FileUploadUtils --> MultipartFile : Uses
-    FileUploadUtils --> FileException : Throws
-    FileUploadUtils --> FileSizeLimitExceededException : Throws
-    FileUploadUtils --> FileNameLengthLimitExceededException : Throws
-    FileUploadUtils --> InvalidExtensionException : Throws
-    FileUploadUtils --> MinioBucket : Uses
+    
+    class MinioClient {
+        +void makeBucket(MakeBucketArgs args) IOException, InvalidKeyException, InvalidResponseException, InsufficientDataException, NoSuchAlgorithmException, ServerException, InternalException, XmlParserException, ErrorResponseException
+        +boolean bucketExists(BucketExistsArgs args) IOException, InvalidKeyException, InvalidResponseException, InsufficientDataException, NoSuchAlgorithmException, ServerException, InternalException, XmlParserException, ErrorResponseException
+        +String getBucketPolicy(GetBucketPolicyArgs args) IOException, InvalidKeyException, InvalidResponseException, InsufficientDataException, NoSuchAlgorithmException, ServerException, InternalException, XmlParserException, ErrorResponseException
+        +void setBucketPolicy(SetBucketPolicyArgs args) IOException, InvalidKeyException, InvalidResponseException, InsufficientDataException, NoSuchAlgorithmException, ServerException, InternalException, XmlParserException, ErrorResponseException
+    }
+    
+    class FileException {
+        +String getDefaultMessage()
+    }
+    
+    class File {
+        +File(String pathname)
+        +boolean exists()
+        +File getParentFile()
+        +boolean mkdirs()
+        +boolean isAbsolute()
+        +File getAbsoluteFile()
+    }
+    
+    class MimeTypeUtils {
+        +String[] DEFAULT_ALLOWED_EXTENSION
+        +String[] IMAGE_EXTENSION
+        +String[] FLASH_EXTENSION
+        +String[] MEDIA_EXTENSION
+        +String[] VIDEO_EXTENSION
+    }
+    
+    class DateUtils {
+        +String datePath()
+    }
+    
+    class FilenameUtils {
+        +String getBaseName(String filename)
+    }
+    
+    class FileTypeUtils {
+        +String getExtension(MultipartFile file)
+    }
+    
+    class Seq {
+        +String getId(String seqType)
+        +String uploadSeqType
+    }
+    
+    FileUploadUtils ..> MultipartFile : Dependency
+    FileUploadUtils ..> FileSizeLimitExceededException : Dependency
+    FileUploadUtils ..> FileNameLengthLimitExceededException : Dependency
+    FileUploadUtils ..> InvalidExtensionException : Dependency
+    FileUploadUtils ..> MinioBucket : Dependency
+    FileUploadUtils ..> FileException : Dependency
+    FileUploadUtils ..> File : Dependency
+    FileUploadUtils ..> MimeTypeUtils : Dependency
+    FileUploadUtils ..> DateUtils : Dependency
+    FileUploadUtils ..> FilenameUtils : Dependency
+    FileUploadUtils ..> FileTypeUtils : Dependency
+    FileUploadUtils ..> Seq : Dependency
+    
+    InvalidExtensionException <|.. InvalidImageExtensionException
+    InvalidExtensionException <|.. InvalidFlashExtensionException
+    InvalidExtensionException <|.. InvalidMediaExtensionException
+    InvalidExtensionException <|.. InvalidVideoExtensionException
 ```
 
-Class diagram description: FileUploadUtils is a file upload utility class that provides functionalities such as file uploading, filename encoding, file size validation, and file type validation. It relies on the MultipartFile interface to handle uploaded files and may throw exceptions such as FileException, FileSizeLimitExceededException, FileNameLengthLimitExceededException, and InvalidExtensionException. Additionally, it offers operations related to MinIO buckets, such as creating a bucket, checking bucket existence, querying and setting bucket policies, etc.
+This code defines a file upload utility class `FileUploadUtils`. Its main functionalities include uploading files to the local disk and managing MinIO object storage. It first checks the file name length, file size, and extension validity. Then it generates a unique file name and saves it to the specified directory. For MinIO operations, it provides functions for bucket creation, existence checking, and policy configuration. The utility class relies on several helper classes for tasks like generating date paths, handling file extensions, and generating sequence numbers. It can also throw various custom exceptions to handle different error conditions.
 
 
 ### Internal Method Call Graph
@@ -102,8 +166,8 @@ Class diagram description: FileUploadUtils is a file upload utility class that p
 ```mermaid
 graph TD
     A["Class FileUploadUtils"]
-    B["Constant: DEFAULT_MAX_SIZE"]
-    C["Constant: DEFAULT_FILE_NAME_LENGTH"]
+    B["Constant: long DEFAULT_MAX_SIZE"]
+    C["Constant: int DEFAULT_FILE_NAME_LENGTH"]
     D["Method: upload(baseDir, file)"]
     E["Method: upload(baseDir, file, allowedExtension)"]
     F["Method: extractFilename(file)"]
@@ -116,7 +180,7 @@ graph TD
     M["Method: queryBucketPolicy(minioBucket)"]
     N["Method: createBucketPolicy(minioBucket)"]
     O["Method: createBucketPolicy(builder, minioBucket)"]
-    P["Method: defaultBucketPolicy(bucketName)"]
+    P["Private Method: defaultBucketPolicy(bucketName)"]
 
     A --> B
     A --> C
@@ -133,44 +197,35 @@ graph TD
     A --> N
     A --> O
     A -.-> P
-    D --> E
-    E --> I
-    E --> F
-    E --> G
-    E --> H
-    K --> L
-    K --> P
-    K --> N
-    N --> O
-    O --> P
 ```
 
-This code represents a file upload utility class, which includes core functionalities such as file size validation, filename processing, and path generation, while integrating MinIO bucket creation and management logic. Key workflows involve: validating filename length and file type, generating unique filenames, saving files to specified paths, and configuring MinIO bucket policies. Exception handling covers scenarios like oversized files, excessive filename lengths, and type mismatches to ensure a secure and reliable upload process.
+**Flowchart Description:**
+This flowchart illustrates the structure and main methods of the `FileUploadUtils` class. The class contains two constants that define file size and filename length limits, along with multiple static methods for file upload and processing. Key methods include the file upload process `upload`, filename extraction `extractFilename`, file validation `assertAllowed`, and bucket operations related to MinIO storage such as `createBucket` and `bucketExist`. These methods work together to ensure the security and legality of file uploads and support integration with object storage services.
 
 ### Field List
 
 | Name  | Type  | Description |
 |-------|-------|------|
-| DEFAULT_FILE_NAME_LENGTH = 100 | int | Define the constant DEFAULT_FILE_NAME_LENGTH, with a default file name length limit of 100 characters. |
-| DEFAULT_MAX_SIZE = 50 * 1024 * 1024 | long | Define a static constant with a default maximum size of 50MB. |
+| DEFAULT_MAX_SIZE = 50 * 1024 * 1024 | long | This code defines a public static constant DEFAULT_MAX_SIZE, whose default value is 50 MB. |
+| DEFAULT_FILE_NAME_LENGTH = 100 | int | Define the constant DEFAULT_FILE_NAME_LENGTH, with a value of 100, to specify the maximum length of the default file name. |
 
 ### Method List
 
 | Name  | Type  | Description |
 |-------|-------|------|
-| isAllowedExtension | boolean | Check if the file extension is in the allowed list, ignoring case. Return true if it exists, otherwise return false. |
-| createBucket | void | Methods for creating a MinIO bucket, checking if the bucket exists, and creating it with default policies if it does not exist based on the configuration. Handling various exceptional cases. |
-| getPathFileName | String | The method takes a filename parameter and returns a path string starting with a slash. It contains no complex logic, simply concatenating the path format. |
-| bucketExist | boolean | Check if a Minio bucket exists, returns a boolean value, may throw various exceptions. |
-| assertAllowed | void | Check whether the file size and extension comply with regulations, and throw corresponding exceptions if they exceed limits or have illegal extensions. |
-| extractFilename | String | Method for extracting file names: Generate a unique file name based on the date path, original file base name, sequence ID, and file extension. |
-| queryBucketPolicy | StringBuilder | Using the `@SneakyThrows` annotation to handle exceptions, query the policy of a specified bucket via `MinioClient` and return the result as a `StringBuilder`. |
-| createBucketPolicy | void | Create a Minio bucket policy using the @SneakyThrows annotation and invoke overloaded methods for processing. |
-| createBucketPolicy | void | The method `createBucketPolicy` is used to configure the MinIO bucket policy. If the input policy is empty, the default policy is applied, and then the policy is set via the MinIO client. |
-| getAbsoluteFile | File | This method creates an absolute path file object based on the upload directory and file name. If the directory does not exist, it will be created, and finally returns the absolute path file object. |
-| upload | String | The static method `upload` accepts directory and file parameters, invokes the overloaded method to upload the file, handles exceptions, and throws an `IOException`. |
-| upload | String | Methods for uploading files, checking filename length and extension, saving the file, and returning the path. Exceptions include file too large, filename too long, and invalid extension. |
-| defaultBucketPolicy | StringBuilder | Generate a default S3 bucket policy that allows public access to specific operations such as getting location, listing multipart uploads, uploading/deleting objects, etc., with resources pointing to the specified bucket and its contents. |
+| isAllowedExtension | boolean | A static method checks whether the file extension is within the allowed list. It iterates through the array, performing case-insensitive comparisons. Returns true if a match exists; otherwise, returns false. |
+| getAbsoluteFile | File | This method is used to obtain an absolute path file object based on the upload directory and file name. If the parent directory does not exist, it will be created, and finally returns the absolute path object of the file. |
+| defaultBucketPolicy | StringBuilder | This Java method is used to generate a default policy JSON string for an AWS S3 bucket. This policy allows all AWS principals to perform specific operations on the specified bucket, including getting the bucket location, listing multipart uploads, as well as uploading, deleting, and reading objects within the bucket. |
+| createBucket | void | This method checks whether a MinIO bucket exists and returns if it does. Otherwise, it creates a bucket based on the name and region and sets the default access rules. |
+| upload | String | This is a Java file upload method that receives directory and file parameters. It calls another upload method, captures and handles any potential exceptions, and finally throws an IOException uniformly. |
+| upload | String | This is a Java file upload method. It checks the filename length and extension, generates a unique filename, and saves the file. The method returns the file access path and may throw exceptions for file size, filename length, or invalid extensions. |
+| extractFilename | String | This method is used to extract and format file names from a MultipartFile. It generates a string containing a date path, the base part of the original file name, a sequence number, and the file extension, formatted as "date path/original file name_sequence number.extension". |
+| bucketExist | boolean | Check if the Minio bucket exists, return a boolean value. Call the bucketExists method of the Minio client, passing the bucket name parameter. The method declares multiple possible exceptions. |
+| queryBucketPolicy | StringBuilder | This method is used to query the policy configuration of a specified bucket. It receives a MinioBucket object, calls the client to get the policy, and returns a result of type StringBuilder. It includes exception handling and declares that it throws an Exception class exception. |
+| createBucketPolicy | void | The method createBucketPolicy declares an exception, calling an overloaded method to create a Minio bucket policy. |
+| getPathFileName | String | This method converts file names into paths by adding a forward slash prefix, ensuring the correct path format. |
+| assertAllowed | void | This method is used to validate uploaded files. First, it checks whether the file size exceeds the default limit; if it does, an exception is thrown. Then, it validates whether the file extension is in the allowed list. If it is not, a corresponding invalid extension exception is thrown based on the type of allowed list. |
+| createBucketPolicy | void | This method uses the SneakyThrows annotation to handle exceptions. It determines whether to use the default policy or a custom policy based on whether the input StringBuilder is empty, and then calls the MinIO client to set the final bucket policy for the specified bucket. |
 
 
 

@@ -7,17 +7,17 @@
 | Code Path | weixin-java-miniapp-demo/src/main/java/com/github/binarywang/demo/wx/miniapp/config/ResourcesConfig.java |
 | Package Name | com.leaniss.file.config |
 | Dependencies | ['java.io.File', 'org.springframework.beans.factory.annotation.Value', 'org.springframework.context.annotation.Configuration', 'org.springframework.web.servlet.config.annotation.CorsRegistry', 'org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry', 'org.springframework.web.servlet.config.annotation.WebMvcConfigurer'] |
-| Brief Description | Java configuration class implements local file path mapping and cross-origin support, sets file storage path and prefix, and allows GET requests for cross-origin access. |
+| Brief Description | Configuration file class implements WebMvc configuration, mapping the local file upload path as static resources, and enabling cross-origin support, allowing all domains to access resources under this path via the GET method. |
 
 # Description
 
-This is a Spring Boot configuration class designed to handle file uploads and cross-origin requests. The class defines two configuration properties: the root path for file storage and the prefix for resource mapping paths. By overriding the `addResourceHandlers` method, it maps local file paths to web-accessible resource paths. Additionally, it overrides the `addCorsMappings` method to configure cross-origin access permissions for file resource paths, allowing all domains to access resources under this path via the GET method. The entire configuration implements the foundational functionality for file upload storage and web access.
+The ResourcesConfig class is a Spring Boot configuration class that implements the WebMvcConfigurer interface. It primarily accomplishes two tasks: first, it configures the access path mapping for local file upload resources by reading the path prefix and local storage root path from the configuration file, thereby mapping specific URL requests to the server's local file system directory; second, it configures cross-origin access support for the aforementioned resource paths, allowing domain names from all origins to perform cross-origin access via the GET method, thus enabling the frontend to successfully retrieve uploaded files from the server.
 
 # Class Summary
 
 | Name   | Type  | Description |
 |-------|------|-------------|
-| ResourcesConfig | class | Java configuration class implements file resource mapping and cross-origin support, sets local storage path and URL prefix, and allows GET requests for cross-origin access. |
+| ResourcesConfig | class | This is a Spring Boot configuration class that implements the WebMvcConfigurer interface. It maps a specified local directory into a web-accessible static resource path by reading the path and prefix from the configuration file. Additionally, it configures cross-origin access rules for this resource path, allowing GET requests from all origin domains. |
 
 
 
@@ -28,7 +28,7 @@ This is a Spring Boot configuration class designed to handle file uploads and cr
 | Access Modifier | @Configuration;public |
 | Type | class |
 | Name | ResourcesConfig |
-| Description | Java configuration class implements file resource mapping and cross-origin support, sets local storage path and URL prefix, and allows GET requests for cross-origin access. |
+| Description | This is a Spring Boot configuration class that implements the WebMvcConfigurer interface. It maps a specified local directory into a web-accessible static resource path by reading the path and prefix from the configuration file. Additionally, it configures cross-origin access rules for this resource path, allowing GET requests from all origin domains. |
 
 
 ### UML Class Diagram
@@ -38,66 +38,82 @@ classDiagram
     class ResourcesConfig {
         -String localFilePath
         +String localFilePrefix
-        +addResourceHandlers(ResourceHandlerRegistry registry) void
-        +addCorsMappings(CorsRegistry registry) void
+        +void addResourceHandlers(ResourceHandlerRegistry registry)
+        +void addCorsMappings(CorsRegistry registry)
     }
 
     class WebMvcConfigurer {
         <<Interface>>
-        +addResourceHandlers(ResourceHandlerRegistry registry) void
-        +addCorsMappings(CorsRegistry registry) void
+        +void addResourceHandlers(ResourceHandlerRegistry registry)
+        +void addCorsMappings(CorsRegistry registry)
+    }
+
+    class ResourceHandlerRegistry {
+        +ResourceHandlerRegistration addResourceHandler(String... pathPatterns)
+    }
+
+    class CorsRegistry {
+        +CorsRegistration addMapping(String... pathPatterns)
+    }
+
+    class ResourceHandlerRegistration {
+        +ResourceHandlerRegistration addResourceLocations(String... locations)
+    }
+
+    class CorsRegistration {
+        +CorsRegistration allowedOrigins(String... origins)
+        +CorsRegistration allowedMethods(String... methods)
     }
 
     ResourcesConfig ..|> WebMvcConfigurer : implements
-    ResourcesConfig --> ResourceHandlerRegistry : depends
-    ResourcesConfig --> CorsRegistry : depends
+    ResourcesConfig --> ResourceHandlerRegistry : depends on
+    ResourcesConfig --> CorsRegistry : depends on
+    ResourceHandlerRegistry --> ResourceHandlerRegistration : creates
+    CorsRegistry --> CorsRegistration : creates
 ```
 
-Class diagram description:
-The ResourcesConfig class is a Spring configuration class that implements the WebMvcConfigurer interface, primarily used for configuring resource handling and cross-origin requests. It contains two main methods: addResourceHandlers for mapping local file paths to URL prefixes, and addCorsMappings for configuring cross-origin access rules. The class includes two properties injected from configuration files: the path prefix (localFilePrefix) and the local file path (localFilePath).
+**Class Diagram Description**:  
+This code defines a Spring Boot configuration class `ResourcesConfig`, which implements the `WebMvcConfigurer` interface. The class contains two properties injected from configuration files: `localFilePath` (local file storage path) and `localFilePrefix` (resource mapping prefix). By overriding the `addResourceHandlers` method, it maps specific URL paths to the local file system, enabling access to static resources. Simultaneously, by overriding the `addCorsMappings` method, it configures cross-origin access policies for these resource paths, allowing GET requests from all domains. The overall design achieves flexible configuration of resource paths and cross-origin support.
 
 
 ### Internal Method Call Graph
 
 ```mermaid
 graph TD
-    A["Class ResourcesConfig"]
-    B["Property: String localFilePath"]
-    C["Property: String localFilePrefix"]
-    D["Method: addResourceHandlers(ResourceHandlerRegistry registry)"]
-    E["Method: addCorsMappings(CorsRegistry registry)"]
-    F["Operation: registry.addResourceHandler"]
-    G["Operation: .addResourceLocations"]
-    H["Operation: registry.addMapping"]
-    I["Operation: .allowedOrigins"]
-    J["Operation: .allowedMethods"]
-
+    A["ResourcesConfig Class"]
+    B["Field: String localFilePath"]
+    C["Field: String localFilePrefix"]
+    D["Method: void addResourceHandlers(ResourceHandlerRegistry registry)"]
+    E["Method: void addCorsMappings(CorsRegistry registry)"]
+    
     A --> B
     A --> C
     A --> D
     A --> E
-    D --> F
-    F --> G
-    E --> H
-    H --> I
-    I --> J
+    
+    D --> F["Execute: registry.addResourceHandler(localFilePrefix + '/**')"]
+    F --> G["Execute: .addResourceLocations('file:' + localFilePath + File.separator)"]
+    
+    E --> H["Execute: registry.addMapping(localFilePrefix + '/**')"]
+    H --> I["Execute: .allowedOrigins('*')"]
+    I --> J["Execute: .allowedMethods('GET')"]
 ```
 
-This code represents a Spring Boot configuration class that primarily implements two functionalities: 1) Configuring local file upload paths and resource mapping rules by mapping URL requests with specified prefixes to local filesystem paths through the `addResourceHandlers` method; 2) Configuring cross-origin access rules by allowing GET requests for specific routes to access across domains through the `addCorsMappings` method. The flowchart clearly illustrates the class structure, property injection, and method invocation relationships, where the resource handler and cross-origin configuration form independent branches, achieving functional configuration through Spring's Registry mechanism.
+This code is a Spring Boot configuration class used for configuring static resource handling and CORS settings. It maps a specified directory on the local filesystem to a web-accessible static resource path by injecting path and prefix parameters from configuration files. Simultaneously, it enables cross-origin access permissions for GET requests on this path. This configuration is commonly used for displaying files after uploading, ensuring the frontend can properly load and display file resources from the server.
 
 ### Field List
 
 | Name  | Type  | Description |
 |-------|-------|------|
-| localFilePath | String | The code snippet defines a private string variable `localFilePath`, whose value is injected from the configuration property `file.path` via the `@Value` annotation. |
-| localFilePrefix | String | The code defines a string variable `localFilePrefix`, whose value is injected from the `file.prefix` property in the configuration file. |
+| localFilePath | String | The code annotation @Value reads the file.path property from the configuration file and assigns it to the string variable localFilePath. |
+| localFilePrefix | String | The code snippet uses the @Value annotation to inject the configuration property file.prefix, and assigns its value to the string-type variable localFilePrefix. |
 
 ### Method List
 
 | Name  | Type  | Description |
 |-------|-------|------|
-| addResourceHandlers | void | This method is used to configure the local file upload path, mapping the specified URL pattern to a local file system path. |
-| addCorsMappings | void | This method configures cross-origin requests, allowing all domains to access the specified route via the GET method. |
+| addResourceHandlers | void | This method configures the local file upload path by mapping a specific URL prefix to a server's local file directory through a resource handler, allowing direct access to uploaded files. |
+| addCorsMappings | void | This code snippet configures cross-origin resource sharing (CORS) for a Spring Boot application, allowing all domain names to access resources under a specific local file path prefix via the GET method. |
 
 
 
